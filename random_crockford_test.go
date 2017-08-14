@@ -38,6 +38,23 @@ func TestNextNegativeLength(t *testing.T) {
 	}
 }
 
+func TestNextShouldBeRandom(t *testing.T) {
+
+	r := random_crockford.NewRandom(8)
+
+	nexts := map[string]bool{}
+
+	for i := 0; i < 100000; i++ {
+
+		next := r.Next()
+		if nexts[next] {
+			t.Fatalf("%s repeated", next)
+		}
+
+		nexts[next] = true
+	}
+}
+
 func BenchmarkNext(b *testing.B) {
 
 	r := random_crockford.NewRandom(10)

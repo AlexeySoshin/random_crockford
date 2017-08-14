@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"strings"
 	"time"
+	"sync"
 )
 
 const sep = ""
@@ -33,13 +34,21 @@ func (r *RandomCrockford) Next() string {
 		return empty
 	}
 
-	r1 := rand.New(rand.NewSource(time.Now().UnixNano()))
-
 	rolls = make([]string, r.radix)
 
+	wg := sync.WaitGroup{}
+
+	wg.Add(r.radix)
+
 	for i := 0; i < r.radix; i++ {
-		rolls[i] = dictionary[r1.Intn(dictionarySize)]
+		go func(index int) {
+			r1 := rand.New(rand.NewSource(time.Now().UnixNano()))
+			rolls[index] = dictionary[r1.Intn(dictionarySize)]
+			wg.Done()
+		}(i)
 	}
+
+	wg.Wait()
 
 	return strings.Join(rolls, sep)
 }
